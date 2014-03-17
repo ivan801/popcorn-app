@@ -117,7 +117,7 @@ if (!isDebug) {
 
 
 // Set the app title (for Windows mostly)
-win.title = 'Popcorn Time';
+win.title = 'MP3-Xtreme';
 
 
 // Focus the window when the app opens

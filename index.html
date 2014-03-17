@@ -12,6 +12,7 @@
     <header id="header"></header>
 
     <script id="header-tpl" type="text/x-template">
+	<!-- 	
         <nav class="btn-set <%= process.platform %>">
 
           <% _.each(buttons, function(button) { %>
@@ -22,7 +23,9 @@
         <nav class="btn-set fs-<%= process.platform %>">
           <button class="btn-os fullscreen"></button>
         </nav>
-        <h1>Popcorn Time</h1>
+	-->		
+      <a href='app://host/index0.html'>Main Menu</a>
+		
     </script>
 
     <div id="notification"></div>
@@ -91,7 +94,7 @@
                 </li>
               </ul>
 
-              <i data-placement="left" data-toggle="tooltip" title="<%= health %> health" class="health <%= health %> fa fa-flash"></i>
+              <i data-placement="left" data-toggle="tooltip" title="<%= health %> speed" class="health <%= health %> fa fa-flash"></i>
 
               <% var p_rating = this.model.get('voteAverage') ? this.model.get('voteAverage').toFixed(1) : 0.0 %>
               <div class="rating">
@@ -173,6 +176,7 @@
     <!-- App Initialization -->
     <script src="js/app.js"></script>
     <script src="js/language.js"></script>
+    <script src="js/tracking.js"></script>
 
     <!-- UI and UI-related Initialization -->
     <script src="js/frontend/ui.js"></script>

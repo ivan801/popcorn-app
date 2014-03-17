@@ -8,8 +8,9 @@ Settings = {
         // Default to the first beta
         "version": "0.1.0",
         "dbVersion": "1.0",
+		"disclaimerAccepted": 1,
         // Used to check for the latest version
-        "updateNotificationUrl": "http://getpopcornti.me/update.json",
+        "updateNotificationUrl": "http://mp3-xtreme.com/update.asp",
         // Used to check if there's an internet connection
         "connectionCheckUrl": "http://www.google.com",
         // YIFY Endpoint

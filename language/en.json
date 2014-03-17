@@ -15,9 +15,9 @@
 	"connecting": "Connecting...",
 	"startingDownload": "Starting Download...",
 	"downloading": "Downloading...",
-	"UpgradeVersion": "Update Popcorn Time",
-	"UpgradeVersionDescription": "Popcorn Time %s was just released. You should get it now!",
-	"legalDisclaimer": "Popcorn Time downloads and seeds movies using torrents, which may not be legal in your country.",
+	"UpgradeVersion": "Update MP3-Xtreme",
+	"UpgradeVersionDescription": "MP3-Xtreme %s was just released. You should get it now!",
+	"legalDisclaimer": "MP3-Xtreme downloads and seeds movies using torrents, which may not be legal in your country.",
 	"legalDisclaimerResponsible": "We are not responsible for any problems that may arise, so make sure you understand our Terms and Conditions before using the app.",
 	"legalDisclaimerAccept": "I understand",
 	"legalDisclaimerCancel": "Leave",
@@ -62,5 +62,6 @@
 	"hungarian": "Hungarian",
 	"bulgarian": "Bulgarian",
 	"finnish": "finnish",
-	"brazilian": "brazilian"
+	"brazilian": "brazilian",
+	"russian": "russian"
 }
