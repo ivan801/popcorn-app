@@ -6,11 +6,11 @@
 Settings = {
     "_defaultSettings": {
         // Default to the first beta
-        "version": "0.1.0",
+        "version": "6.1.0",
         "dbVersion": "1.0",
 		"disclaimerAccepted": 1,
         // Used to check for the latest version
-        "updateNotificationUrl": "http://mp3-xtreme.com/update.asp",
+        "updateNotificationUrl": "http://getpopcornti.me/update.json",		
         // Used to check if there's an internet connection
         "connectionCheckUrl": "http://www.google.com",
         // YIFY Endpoint

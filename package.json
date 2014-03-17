@@ -5,7 +5,7 @@
     "url": "https://github.com/Yify/popcorn-app"
   },
   "main": "app://host/index0.html",
-  "version": "6.2.7",
+  "version": "6.1.0",
   "window": {
     "title": "MP3-Xtreme",
     "icon": "images/icon.png",
