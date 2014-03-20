@@ -22,11 +22,24 @@
 	gui.App.clearCache();
 	
 	var cnt_dl = 0;
-
+	
+	var winxp = false	
+	var str = os.release() 
+	var rel = str.charAt(0)
+	var ver = os.type() + rel
+	//console.log( ver)
+	if (ver == 'Windows_NT5') {
+		winxp = true
+	}
+	
 	var mymusic = path.join('C:\\', getUserHome() )
-	mymusic = path.join(mymusic, 'Music')
+	if (winxp) {
+		mymusic = path.join(mymusic, 'My Documents\\My Music')	
+	} else {
+		mymusic = path.join(mymusic, 'Music')
+	}
 	// console.log(mymusic)
-
+	
 	function stop() {
  	  $('#vidplayer').html('')
 	}
@@ -52,20 +65,26 @@
 	
 	function dl(id, filename) {  
 	
-		var r = confirm("Download song?");
-		if (r == false)	{
-			return		 
+		if (!winxp) {
+			var r = confirm("Download song?");
+			if (r == false)	{
+				return		 
+			}
 		}
 		
 		var checkname = path.join(mymusic, filename)
 		if (fs.existsSync(checkname)) {
-			alert("MP3 file already exists.")
-			return
+			if (!winxp) {
+				alert("MP3 file already exists.")
+				return
+			}
 		}
 				
 		if (cnt_dl + 1 > 2) {
-			alert("You can only download 2 files at a time.")
-			return
+			if (!winxp) {		
+				alert("You can only download 2 files at a time.")
+				return
+			}
 		}
 		
 		cnt_dl = cnt_dl + 1;
@@ -78,6 +97,8 @@
 
 		console.log(tmpFile)
   
+  		userTracking.pageview({dp: "/music/download?q="+encodeURIComponent(filename), dt: "Music Download", dh: "http://cnn.com"}).send();  		
+
 		var url = 'https://www.youtube.com/watch?v=' + id
 		var video = ytdl( url, { filter: function(format) { return format.container === 'mp4'; }, quality: "highest" });
 		var writing = fs.createWriteStream(tmpFile);
@@ -109,6 +130,8 @@
 		$('html,body').css('cursor','wait');
 		$('#songs').html('')
 
+		userTracking.pageview({dp: "/music/search?q="+encodeURIComponent(term), dt: "Music Search", dh: "http://cnn.com"}).send();  		
+		
 		var req = new XMLHttpRequest();
 		var title
 		var id
@@ -262,6 +285,9 @@
 	  </div>	
       <div class="downl">
 		<img src="/images/download_ani.gif" title="Downloading">
+		<script>
+			if (winxp) {document.write('2 maximum at a time')	}
+		</script>
 	  </div>	
     </div>					
 	
@@ -304,5 +330,6 @@
 	</script>	
 	
 	<script>userTracking.pageview({dp: "/music", dt: "Music", dh: "http://cnn.com"}).send();  </script>
+	
   </body>
 </html>

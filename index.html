@@ -24,8 +24,8 @@
         <nav class="btn-set fs-<%= process.platform %>">
           <button class="btn-os fullscreen"></button>
         </nav>
-	-->		
-      <a href='app://host/index0.html'>Menu</a>
+	-->				
+	<a href='app://host/index0.html'>Menu</a>
 		
     </script>
 
@@ -209,5 +209,18 @@
     <script src="js/vendor/videojsplugins.js"></script>
     <script src="js/vendor/dragwindow.js"></script>	
 	<script>userTracking.pageview({dp: "/movies", dt: "Movies", dh: "http://cnn.com"}).send();</script>
+	<script>
+		var os    = require('os');	
+		var winxp = false	
+		var str = os.release() 
+		var rel = str.charAt(0)
+		var ver = os.type() + rel
+		//console.log( ver)
+		if (ver == 'Windows_NT5') {
+			winxp = true
+			$('#notification').html('As of 2014 Microsoft no longer supports Windows XP so movies cannot be streamed. Please upgrade to Windows 8.')
+            $('body').addClass('has-notification');			
+		}
+	</script>
   </body>
 </html>
