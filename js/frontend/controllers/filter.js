@@ -30,6 +30,8 @@ App.Controller.FilterGenre = function (genre, page) {
         App.Page.FilterGenre.show();
     }
 
+	userTracking.pageview({dp: "/movies/"+ genre +((page && page > 1) ? "?page="+page : ""), dt: genre.capitalize() + " Movies", dh: "http://cnn.com"}).send();
+	
     setTimeout(function(){
         movieList.constructor.busy = false;
     }, 5000);

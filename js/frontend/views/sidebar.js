@@ -74,13 +74,15 @@ App.View.Sidebar = Backbone.View.extend({
                 }
 
                 if( bufferStatus != previousStatus ) {
+                    userTracking.event('Video Preloading', bufferStatus, movieModel.get('niceTitle')).send();								
                     previousStatus = bufferStatus;
                 }
 
                 $('.popcorn-load .progressinfo').text( i18n.__(bufferStatus) );
             }
         );
-
+		
+	  userTracking.event('Movie Quality', 'Watch on '+this.model.get('quality')+' - '+this.model.get('health').capitalize(), this.model.get('niceTitle') ).send();
     },
 
     initialize: function () {
@@ -143,7 +145,9 @@ App.View.Sidebar = Backbone.View.extend({
             noSubForUser = false;
           }
         }
-
+		
+		userTracking.event( 'Movie Closed', this.model.get('niceTitle'),
+		    (noSubForUser ? 'No Local Subtitles' : 'With Local Subtitles') +' - '+ this.model.get('health').capitalize() ).send();
       }
 
       $('.movie.active').removeClass('active');
@@ -162,6 +166,9 @@ App.View.Sidebar = Backbone.View.extend({
         this.backdropCache.onload = function () {
             $(".backdrop-image").addClass("loaded")
         };
+		
+		userTracking.pageview({dp: "/movies/info/"+this.model.get("slug"), dt: this.model.get("niceTitle"), dh: "http://cnn.com"}).send();	
+		
     },
 
     enableHD: function (evt) {

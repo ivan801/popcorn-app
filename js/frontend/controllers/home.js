@@ -34,6 +34,8 @@ App.Controller.Home = function (page) {
         App.Page.Home.show();
     }
 
+	userTracking.pageview({dp: "/movies/popular"+((page && page > 1) ? "?page="+page : ""), dt: "Popular Movies", dh: "http://cnn.com"}).send();
+	
     setTimeout(function(){
         movieList.constructor.busy = false;
     }, 5000);
