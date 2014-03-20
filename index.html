@@ -5,6 +5,7 @@
     <script>window.__startTime = (new Date()*1);</script>
     <link rel="stylesheet" type="text/css" href="css/app.css">
     <link rel="stylesheet" type="text/css" href="js/vendor/video-js/video-js.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
 
   </head>
   <body>
@@ -24,7 +25,7 @@
           <button class="btn-os fullscreen"></button>
         </nav>
 	-->		
-      <a href='app://host/index0.html'>Main Menu</a>
+      <a href='app://host/index0.html'>Menu</a>
 		
     </script>
 
@@ -115,6 +116,10 @@
 
             <p><%= synopsis %></p>
 
+            <% if (this.model.get('torrents')) { %>
+              <a href="" class="p_tooltip play-button" disabled="disabled"><%= i18n.__('watchItNow') %></a>
+            <% } %>
+
             <% if ( ! _.isEmpty(subtitles) ) { %>
             <div class="subtitles-list">
               <h4><%= i18n.__('subtitledIn') %></h4>
@@ -131,9 +136,6 @@
             </div>
             <% } %>
 
-            <% if (this.model.get('torrents')) { %>
-              <a href="" class="p_tooltip play-button" disabled="disabled"><%= i18n.__('watchItNow') %></a>
-            <% } %>
           </div>
         </div>
       </div>
@@ -206,6 +208,7 @@
     <!-- Other Dependencies -->
     <script src="js/vendor/video-js/video.dev.js"></script>
     <script src="js/vendor/videojsplugins.js"></script>
-    <script src="js/vendor/dragwindow.js"></script>
+    <script src="js/vendor/dragwindow.js"></script>	
+	<script>userTracking.pageview({dp: "/movies", dt: "Movies", dh: "http://cnn.com"}).send();</script>
   </body>
 </html>

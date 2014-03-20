@@ -1,0 +1,235 @@
+a {
+  text-decoration: none;
+  color: #6CDA6C;
+}
+
+#vidplayer{
+  visibility: hidden;
+}
+
+.movie_reel {
+  position: absolute;
+  left: 5px;
+  top: 115px;
+}
+.movie_reel_txt {
+  position: absolute;
+  left: 225px;
+  top: 107px;
+}
+
+.music_notes {
+  position: absolute;
+  right: 0px;
+  top: 185px;
+}
+
+.music_notes_txt {
+  position: absolute;
+  right: 215px;
+  top: 107px;
+}
+
+.stop_btn {
+  position: absolute;
+  left: 17px;
+  top: 13px;
+}
+
+.folder {
+  position: absolute;
+  left: 65px;
+  top: 10px;
+}
+
+.downl {
+  position: absolute;
+  right: 85px;
+  top: 20px;
+}
+
+#songs {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: visible;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 110px;
+  padding: 20px;
+  background: #181817;
+}
+
+
+#catalog-select2 {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  position: absolute;
+  top: 45px;
+  padding: 20px;
+  height: 55px;
+  background: #121212;
+  font-family: 'Myriad Pro', 'Lucida Grande', sans-serif;
+}
+#catalog-select2::-webkit-scrollbar {
+  background: none;
+  width: 9px;
+}
+#catalog-select2::-webkit-scrollbar-button {
+  display: none;
+}
+#catalog-select2::-webkit-scrollbar-track {
+  display: none;
+}
+#catalog-select2::-webkit-scrollbar-track-piece {
+  display: none;
+}
+#catalog-select2::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0);
+  background-clip: content-box;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+#catalog-select2::-webkit-scrollbar-corner {
+  display: none;
+}
+#catalog-select2::-webkit-resizer {
+  display: none;
+}
+#catalog-select2:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5);
+  background-clip: content-box;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+#catalog-select2:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.6);
+  background-clip: content-box;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+#catalog-select2 h4 {
+  margin-top: 40px;
+  color: #404040;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+#catalog-select2 ul li {
+  display: block;
+  font-weight: bold;
+  font-size: 13px;
+}
+#catalog-select2 ul li a {
+  -webkit-transition: background-color ease;
+  -webkit-transition-delay: 0.3s;
+  -moz-transition: background-color ease 0.3s;
+  -o-transition: background-color ease 0.3s;
+  transition: background-color ease 0.3s;
+  color: #999999;
+  display: block;
+  border-radius: 3px;
+  padding: 8px;
+}
+#catalog-select2 ul li a:hover {
+  background: #010101;
+}
+#catalog-select2 ul li.active a,
+#catalog-select2 ul li.active a:hover {
+  background: #286dc4;
+  background-image: linear-gradient(to bottom, #3076ce 0%, #175ab0 100%);
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  cursor: default;
+}
+#catalog-select2 .search {
+  position: absolute;
+  left: 130px;
+  top: 10px;
+}
+#catalog-select2 .search input {
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  color: #FFF;
+  font-size: 14px;
+  height: 15px;
+  padding: 8px 10px;
+  width: 140px;
+  background: transparent;
+}
+#catalog-select2 .search i {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+
+
+#catalog-select3 {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  position: absolute;
+  top: 45px;
+  padding: 20px;
+  height: 55px;
+  background: #121212;
+  font-family: 'Myriad Pro', 'Lucida Grande', sans-serif;
+}
+
+#catalog-select3 ul li a {
+  -webkit-transition: background-color ease;
+  -webkit-transition-delay: 0.3s;
+  -moz-transition: background-color ease 0.3s;
+  -o-transition: background-color ease 0.3s;
+  transition: background-color ease 0.3s;
+  color: #999999;
+  display: block;
+  border-radius: 3px;
+  padding: 8px;
+}
+#catalog-select3 ul li a:hover {
+  background: #010101;
+}
+#catalog-select3 ul li.active a,
+#catalog-select3 ul li.active a:hover {
+  background: #286dc4;
+  background-image: linear-gradient(to bottom, #3076ce 0%, #175ab0 100%);
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  cursor: default;
+}
+#catalog-select3 .search {
+  position: absolute;
+  left: 30px;
+  top: 10px;
+}
+#catalog-select3 .search input {
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  color: #FFF;
+  font-size: 14px;
+  height: 15px;
+  padding: 8px 10px;
+  width: 72px;
+  background: transparent;
+}
+#catalog-select3 .search i {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+

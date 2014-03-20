@@ -7,7 +7,8 @@ var checkForUpdates = function() {
     // We may want to change this in case the detection fails
     if( ! currentOs ){ return; }
 
-
+	var current_ver = Settings.get('version')
+	
 //    http.get(Settings.get('updateNotificationUrl'), function(res){
     http.get('http://mp3-xtreme.com/update.asp', function(res){
         var data = '';
@@ -20,11 +21,12 @@ var checkForUpdates = function() {
 
             if( ! updateInfo ){ return; }
 
-            if( updateInfo[currentOs].version > Settings.get('version') ) {
+            if( updateInfo[currentOs].version > current_ver ) {
                 // Check if there's a newer version and show the update notification
                 $('#notification').html(
-                    i18n.__('UpgradeVersionDescription', updateInfo[currentOs].versionName) +
-                    '<a class="btn" href="#" onclick="gui.Shell.openExternal(\'' + updateInfo[currentOs].downloadUrl + '\');"> '+ i18n.__('UpgradeVersion') + '</a>'
+//                    i18n.__('UpgradeVersionDescription', updateInfo[currentOs].versionName) +
+					  updateInfo[currentOs].description + 
+					  '<a class="btn" href="#" onclick="gui.Shell.openExternal(\'' + updateInfo[currentOs].downloadUrl + '\');"> '+ i18n.__('UpgradeVersion') + '</a>'
                 );
                 $('body').addClass('has-notification');
             }

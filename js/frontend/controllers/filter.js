@@ -25,6 +25,8 @@ App.Controller.FilterGenre = function (genre, page) {
 	// Clean up if first page
     if (!page || page == '1'){
         $('.movie-list').first().empty();
+		App.loader(true, i18n.__('searchLoading'));		
+		window.initialLoading = true;		
         App.Page.FilterGenre.show();
     }
 

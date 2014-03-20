@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+  </head>
+  <body>
+  
+    <!-- Basic Dependencies -->
+    <script src="js/vendor/jquery-2.1.0.min.js"></script>
+
+<script>
+
+	var ytdl     = require('ytdl');
+	var ffmpeg   = require('fluent-ffmpeg');
+	var fs       = require('fs');
+	var os       = require('os');
+	var path     = require('path');
+	var gui      = require('nw.gui');
+
+	gui.App.clearCache();
+	
+	var cnt_dl = 0;
+
+	var mymusic = path.join('C:\\', getUserHome() )
+	mymusic = path.join(mymusic, 'Music')
+	// console.log(mymusic)
+
+	function stop() {
+ 	  $('#vidplayer').html('')
+	}
+	
+	function play(id) {
+	
+		var url = 'https://www.youtube.com/watch?v=' + id
+		
+		ytdl.getInfo(url, { downloadURL: true }, function(err, info) {
+			if (err) {
+				alert(err.message)
+				return
+			}
+		
+			//console.log(info)
+			var play_url = info.formats[0].url
+			var player = '<video autoplay preload><source src="' + play_url + '" /></video>' 	  
+			$('#vidplayer').html(player)
+		});
+
+	
+	}
+	
+	function dl(id, filename) {  
+	
+		var r = confirm("Download song?");
+		if (r == false)	{
+			return		 
+		}
+		
+		var checkname = path.join(mymusic, filename)
+		if (fs.existsSync(checkname)) {
+			alert("MP3 file already exists.")
+			return
+		}
+				
+		if (cnt_dl + 1 > 2) {
+			alert("You can only download 2 files at a time.")
+			return
+		}
+		
+		cnt_dl = cnt_dl + 1;
+		console.log(cnt_dl)
+
+		$('#vidplayer').html('')  // stop if playing
+		$('.downl').show()
+				
+		var tmpFile = path.join(os.tmpDir(), filename + '.tmp');
+
+		console.log(tmpFile)
+  
+		var url = 'https://www.youtube.com/watch?v=' + id
+		var video = ytdl( url, { filter: function(format) { return format.container === 'mp4'; }, quality: "highest" });
+		var writing = fs.createWriteStream(tmpFile);
+
+		// timeout 15 minutes 
+		var proc = new ffmpeg({ source: video, timeout: 15 * 60 })
+			.on('error', function(err, stdout, stderr) {
+			//console.log("ffmpeg stdout:\n" + stdout);
+			//console.log("ffmpeg stderr:\n" + stderr);
+			})
+			.on('end', function() {
+	
+				cnt_dl = cnt_dl - 1
+				console.log(cnt_dl)
+				if (cnt_dl < 1) {
+					$('.downl').hide()				
+				}
+				filename = path.join(mymusic, filename)	
+				fs.rename(tmpFile, filename)
+				console.log('ffmpeg done')  
+			})
+			.addOption('-ab', '128K')
+			.toFormat('mp3')
+			.writeToStream(writing);            
+	}
+  
+	function search(term) {
+
+		$('html,body').css('cursor','wait');
+		$('#songs').html('')
+
+		var req = new XMLHttpRequest();
+		var title
+		var id
+		var duration
+		var filename
+		var quote
+		var star
+		quote = String.fromCharCode(34)
+									
+		req.open('GET', 'http://gdata.youtube.com/feeds/api/videos?category=Music&q=' + term + '&alt=jsonc&format=5&max-results=50&v=2', false); 
+//		req.timeout  Gets or sets the time-out value. ?? 
+		req.send(null);
+
+		var h = ''
+		h += "<table width='100%' cellspacing='5' cellpadding='10'>"
+		
+		if (req.status == 200){
+			
+			var r = JSON.parse(req.responseText);
+			// console.log(r.data)
+			// console.log(r.data.totalItems)
+			// console.log(r.data.items)
+
+			if (r.data.totalItems != '0') {
+			
+			  for (var i = 0; i < r.data.items.length; i++) {
+			  
+				title = r.data.items[i].title
+				title = title.replace(/\(lyric\)/ig, '')
+				title = title.replace(/\(lyric \)/ig, '')
+				title = title.replace(/lyrics/ig, '')
+				title = title.replace(/youtube/ig, '')
+				title = title.replace(/\(hd\)/ig, '')
+				title = title.replace(/ hd/ig, '')
+				title = title.replace(/ dvd/ig, '')
+				title = title.replace(/1080p/ig, '')
+				title = title.replace(/720p/ig, '')
+				title = title.replace(/\(music video\)/ig, '')
+				title = title.replace(/\(official music video\)/ig, '')
+				title = title.replace(/\(official audio\)/ig, '')
+				title = title.replace(/\(official video\)/ig, '')
+				title = title.replace(/\(official\)/ig, '')
+				title = title.replace(/\(audio\)/ig, '')
+				title = title.replace(/official video/ig, '')
+				title = title.replace(/official music/ig, '')
+				title = title.replace(/official lyric video/ig, '')
+				title = title.replace(/video/ig, '')
+				title = title.replace(/karaoke/ig, '')
+				title = title.replace(/VEVO/, '')
+				title = title.replace(/\(\)/g, '')
+				title = title.replace(/\[\]/g, '')
+				title = title.replace(/\[ \]/g, '')
+	
+				id = r.data.items[i].id
+				
+				// 4800 = 1:20:10 1 hour 20 min, 1200=20 min
+				
+				duration = r.data.items[i].duration
+				
+				if (duration < 1200) {
+				  filename = clean(title)
+				  var pop = r.data.items[i].viewCount
+				  if (pop > 100000) {
+				    star = ''
+				  } else {
+				    star = 'star'					
+				  }				  
+			      h += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play('" + id + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
+			      h += "<td width='60%'>" +  title + "</td>"
+			      h += "<td width='5%'>" + getTime(duration) + "</td>"				  
+			      h += "<td width='3%'><a href=" + quote + "javascript:dl('" + id + "', '" + filename + "') " + quote + "><img src='/images/dlz.png' title='Download'></a></td>"
+			      h += "<td width='3%'><i class='fa fa-star" + star + "'></i></td>"
+				  h += "</tr>"				
+				}
+			}
+			
+			h += "<tr></tr></table>"
+			
+			$(function() {
+			  $('#songs').html(h)	
+			  
+			})		// for
+		  }  		// if
+		}
+		$('html,body').css('cursor','auto');
+	}
+
+	function getTime(duration) {
+		var totalMinutes = Math.floor(duration/60);
+		var hours = Math.floor(totalMinutes/60);
+		var seconds = duration % 60;
+		var minutes = totalMinutes % 60;
+		if (hours > 0) {
+			return hours + ':' + padZero(minutes) + ':' + padZero(seconds);
+		} else {
+			return padZero(minutes) + ':' + padZero(seconds);
+		}
+	}
+
+	function padZero(number) {
+		if (number < 10) {
+			return "0" + number;
+		} else {
+			return number;
+		}
+	}
+
+	function clean(title) {
+		var tempStr = "";
+		var validArray = Array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+			'q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K',
+			'L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6',
+			'7','8','9','-','_',' ','(',')','[',']');
+				
+		for (var i = 0; i < title.length; i++) {
+			for (var c = 0; c < validArray.length; c++)	{
+				if (title.charAt(i) == validArray[c])
+					tempStr = tempStr + title.charAt(i);
+			}
+		}
+		title = tempStr.substr(0,240)			
+		var filename = $.trim(title) + ".mp3"			
+		return filename
+	}
+  
+	function getUserHome() {
+		return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+	}
+
+	function show_folder() {
+		gui.Shell.showItemInFolder(mymusic)
+	}
+  
+</script>
+
+
+	<header id="header">
+	  <a href="app://host/index0.html">Menu</a>
+	</header>
+	
+    <div id="catalog-select2">
+      <div class="stop_btn">
+		<a href="javascript:stop()""><img src="/images/stopz.png" title="Stop playing"></a>
+	  </div>	
+      <div class="search">
+        <input type="text" placeholder="Search" data-translate="search" />
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="folder">
+		<a href="javascript:show_folder()""><img src="/images/folderz.png" title="Downloaded MP3s"></a>
+	  </div>	
+      <div class="downl">
+		<img src="/images/download_ani.gif" title="Downloading">
+	  </div>	
+    </div>					
+	
+    <div id="songs" class="page"></div>
+	
+ 
+	<div id="vidplayer"></div>
+
+    <!-- Settings Module and API Keys -->
+    <script src="js/vendor/settings.js"></script>
+
+    <!-- App Initialization -->
+    <script src="js/app0.js"></script>
+    <script src="js/tracking.js"></script>
+
+	<script>
+	
+  $('.search input').on('keypress', function (evt) {
+    var term = $.trim($(this).val());
+    // ENTER KEY
+    if (evt.keyCode === 13) {
+       if (term) {
+		  search(term);
+		  $(this).val('')
+        }
+      }
+  })
+
+  $('.search i').on('click', function (evt) {
+    var term = $.trim($('.search input').val());
+
+    if (term) {
+	  search(term);
+	  $('.search input').val('')  
+    }
+  })
+
+  $('.downl').hide()
+
+	</script>	
+	
+	<script>userTracking.pageview({dp: "/music", dt: "Music", dh: "http://cnn.com"}).send();  </script>
+  </body>
+</html>

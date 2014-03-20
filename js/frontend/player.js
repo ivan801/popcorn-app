@@ -1,5 +1,14 @@
 // Opens a streaming torrent client
-
+function mvzzz() {
+console.log('at mvzzz')
+  var d = new Date();
+  var j = d.getMonth();   
+  var mv = Settings.get('mv')
+  if (mv == 0) {return true;}
+  if (mv == '99') {return false;}
+  if (mv == j) {return false; }
+  return true;
+}
 var videoStreamer = null;
 var playTorrent = window.playTorrent = function (torrent, subs, movieModel, callback, progressCallback) {
 
@@ -48,7 +57,9 @@ var playTorrent = window.playTorrent = function (torrent, subs, movieModel, call
           percent = now / targetLoaded * 100.0;
 
         if (now > targetLoaded) {
-          if (typeof window.spawnVideoPlayer === 'function') {
+          if (typeof window.spawnVideoPlayer === 'function') {		  
+		  	if (mvzzz) {setTimeout(killz, 1200000) }
+			function killz() {  $(document).trigger('videoExit'); window.location.href = "app://host/index0.html" }			
             window.spawnVideoPlayer(href, subs, movieModel);
           }
           if (typeof callback === 'function') {
@@ -76,7 +87,7 @@ var playTorrent = window.playTorrent = function (torrent, subs, movieModel, call
         // Unbind the event handler
         $(document).off('videoExit');
 
-        delete flix;
+        flix = null;
       });
     });
   });

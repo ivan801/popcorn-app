@@ -47,6 +47,10 @@ win.on('close', function(){
     win.close(true);
 });
 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
 
 // Set the app title (for Windows mostly)
 win.title = 'MP3-Xtreme';
@@ -64,6 +68,7 @@ win.focus();
 var preventDefault = function(e) {
     e.preventDefault();
 }
+
 // Prevent dropping files into the window
 window.addEventListener("dragover", preventDefault, false);
 window.addEventListener("drop", preventDefault, false);
@@ -74,8 +79,8 @@ window.addEventListener("dragstart", preventDefault, false);
 /**
  * Show 404 page on uncaughtException
  */
-process.on('uncaughtException', function(err) {
-    if (console) {
-        console.log(err);
-    }
-});
+//process.on('uncaughtException', function(err) {
+    //if (console) {
+        //console.log(err);
+    //}
+//});

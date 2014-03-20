@@ -8,8 +8,8 @@
   "version": "6.1.0",
   "window": {
     "title": "MP3-Xtreme",
-    "icon": "images/icon.png",
-    "toolbar": true,
+    "icon": "images/xtreme.png",
+    "toolbar": false,
     "frame": true,
     "width": 962,
     "height": 600,
@@ -18,7 +18,9 @@
     "resizable": true
   },
   "dependencies": {
-    "universal-analytics": "0.3.4",  
+    "universal-analytics": "0.3.4",
+	"ytdl": "0.2.2",
+	"fluent-ffmpeg": "1.6.0",
     "clivas": "0.1.4",
     "network-address": "0.0.4",
     "ip": "0.3.0",

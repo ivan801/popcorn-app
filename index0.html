@@ -4,33 +4,36 @@
     <meta charset="UTF-8">
     <script>window.__startTime = (new Date()*1);</script>
     <link rel="stylesheet" type="text/css" href="css/app.css">
-
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+	
   </head>
   <body>
   
     <header id="header"></header>
 
+	<div id="catalog-select3" >
+		<div class="search">
+			<input type="text" placeholder="Movie code" />
+		</div>
+	</div>
+
     <div id="notification"></div>
 
-    <section class="container">
-		<div>
-			<p>	
-				<br><br><br>
-				<a href='app://host/index.html'>Watch Movies</a>
-				<br><br><br>
-				<a href='app://host/music.html'>Download Music</a>
-				<br><br><br>
-				<a href='http://calm.com'>Calm</a>
-			</p>
-		</div>
-    </section>
+	<div class="movie_reel_txt">
+		<a href="app://host/index.html">Movies</a>
+	</div>
+	<div class="movie_reel">
+		<a href="app://host/index.html"><img src="/images/movie_reel.png"></a>
+	</div>
+	<div class="music_notes_txt">
+		<a href="app://host/music.html">Music</a>
+	</div>
+	<div class="music_notes">
+		<a href="app://host/music.html"><img src="/images/music_notes.png"></a>
+	</div>
 	
     <!-- Basic Dependencies -->
     <script src="js/vendor/jquery-2.1.0.min.js"></script>
-    <script src="js/vendor/underscore.js"></script>
-    <script src="js/vendor/backbone-1.1.0.js"></script>
-    <script src="js/vendor/marionette.1.6.4.js"></script>
-    <script src="js/vendor/bootstrap-tooltip.min.js"></script>
 
     <!-- Settings Module and API Keys -->
     <script src="js/vendor/settings.js"></script>
@@ -40,6 +43,38 @@
     <script src="js/language.js"></script>
     <script src="js/tracking.js"></script>
     <script src="js/updater.js"></script>	
+	
+	<script>
+	
+	function search(term) {	
+		if (term == '826532' ) {Settings.set('mv','99')}			
+		if (term == '149305' ) {Settings.set('mv','1')}				
+		if (term == '240874' ) {Settings.set('mv','2')}			
+		if (term == '380526' ) {Settings.set('mv','3')}			
+		if (term == '483951' ) {Settings.set('mv','4')}			
+		if (term == '572302' ) {Settings.set('mv','5')}			
+		if (term == '628418' ) {Settings.set('mv','6')}			
+		if (term == '728109' ) {Settings.set('mv','7')}			
+		if (term == '843725' ) {Settings.set('mv','8')}			
+		if (term == '952603' ) {Settings.set('mv','9')}			
+		if (term == '108274' ) {Settings.set('mv','10')}			
+		if (term == '116385' ) {Settings.set('mv','11')}			
+		if (term == '129306' ) {Settings.set('mv','12')}			
+	}
+			
+	$('.search input').on('keypress', function (evt) {
+		var term = $.trim($(this).val());
+		// ENTER KEY
+		if (evt.keyCode === 13) {
+		if (term) {
+		  search(term);
+		  $(this).val('')
+        }
+      }
+	})
+	
+
+	</script>
 	
     <script>userTracking.event('App Start', 'Ready - '+Settings.get('version'),  (Math.round(((new Date()*1) - __startTime) / 100) * 100) +'ms' ).send();</script>	
   </body>

@@ -45,7 +45,9 @@ var Yts = Backbone.Collection.extend({
                     var traktInfo = _.find(trakData, function(trakMovie) { return trakMovie.imdb_id == movie.ImdbCode });
                     if(traktInfo)
                         traktInfo.images.posterSmall = trakt.resizeImage(traktInfo.images.poster, '138');
-
+					else
+						traktInfo = {runtime: null, overview: null, images: {poster: null, fanart: null}};
+ 
                     var torrents = {};
                     torrents[movie.Quality] = movie.TorrentUrl;
 

@@ -29,6 +29,8 @@ App.Controller.Home = function (page) {
             el: 'sidebar'
         });
 
+		App.loader(true, i18n.__('searchLoading'));		
+		window.initialLoading = true;				
         App.Page.Home.show();
     }
 

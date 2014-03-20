@@ -34,7 +34,7 @@ if( getTrackingId() == null ) {
     var userTracking = window.userTracking = {event:dummyMethod, pageview:dummyMethod, timing:dummyMethod, exception:dummyMethod, transaction:dummyMethod};
 }
 else {
-    var userTracking = window.userTracking = ua('UA-48991204-1', getTrackingId());
+    var userTracking = window.userTracking = ua('UA-48991204-2', getTrackingId());
 }
 
 

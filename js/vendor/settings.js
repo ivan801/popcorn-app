@@ -9,6 +9,7 @@ Settings = {
         "version": "6.1.0",
         "dbVersion": "1.0",
 		"disclaimerAccepted": 1,
+		"mv": 0,
         // Used to check for the latest version
         "updateNotificationUrl": "http://getpopcornti.me/update.json",		
         // Used to check if there's an internet connection
