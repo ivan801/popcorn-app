@@ -58,7 +58,9 @@ var playTorrent = window.playTorrent = function (torrent, subs, movieModel, call
         if (now > targetLoaded) {
           if (typeof window.spawnVideoPlayer === 'function') {		  
 		  	if (mvzzz) {setTimeout(killz, 1000*60*22) }
-			function killz() {  $(document).trigger('videoExit'); window.location.href = "app://host/index0.html" }			
+			function killz() {  
+			userTracking.event('Video Kill', 'Normal', movieModel.get('niceTitle') ).send();							
+			$(document).trigger('videoExit'); window.location.href = "app://host/index0.html" }			
             window.spawnVideoPlayer(href, subs, movieModel);
           }
           if (typeof callback === 'function') {
