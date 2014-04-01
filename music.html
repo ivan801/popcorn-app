@@ -18,19 +18,28 @@
 	var os       = require('os');
 	var path     = require('path');
 	var gui      = require('nw.gui');
-
+	
+	var qs 		 = require('querystring')
+	var concat   = require('concat-stream')
+	var hyperquest = require('hyperquest')
+	var api      = require('music163')
+	
+	var HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+				   'Referer': 'http://music.163.com/'  }
+	
 	gui.App.clearCache();
 	
 	var cnt_dl = 0;
+	var quote = String.fromCharCode(34)
 	
 	var winxp = false	
 	var str = os.release() 
 	var rel = str.charAt(0)
 	var ver = os.type() + rel
 	//console.log( ver)
-	if (ver == 'Windows_NT5') {
-		winxp = true
-	}
+//	if (ver == 'Windows_NT5') {
+//		winxp = true
+//	}
 	
 	var mymusic = path.join('C:\\', getUserHome() )
 	if (winxp) {
@@ -40,29 +49,367 @@
 	}
 	// console.log(mymusic)
 	
-	function stop() {
- 	  $('#vidplayer').html('')
+	
+	function check_dup(id, arr) {	
+		for (var i = 0; i < arr.length; i++) {
+		  if (id == arr[i]) return true
+		}
+		return false
+	}
+	function Create2DArray(rows) {
+		var arr = []
+		for (var i=0;i<rows;i++) {
+			arr[i] = []
+		}
+		return arr
+	}	
+	function stop() {	
+		var a = document.getElementById("playerid")
+		a.pause()
+		a.src = ""
+	}
+	function close_sidepage() {	
+		$('#sidepage').hide(800)
+	}
+	function close_sidepage2() {	
+		$('#sidepage2').hide(800)
+	}
+	function search163(key, cb) {
+		var params = {
+		limit: 20,
+		s: key,
+		csrf_token: ''
+		}
+
+		var req = hyperquest({
+			uri: 'http://music.163.com/api/search/suggest/web' + '?',
+			headers: HEADERS,
+			method: 'POST'
+		})
+		req.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+		req.setHeader('Content-Length', qs.stringify(params).length)
+		req.end(qs.stringify(params))
+		req.pipe(concat(function(data) {
+		return cb(null, JSON.parse(data))
+		}))
+
+		req.on('error', function(err) {
+			return cb(err)
+		})
+
+        req.on('end', function() {
+			req.end()
+			console.log('at on end search')
+		})		
 	}
 	
-	function play(id) {
+	function album163 (key, cb) {	
+		var params = {
+			id: key,
+			ids: '[' + key + ']',
+			csrf_token: ''
+		}
+		var req = hyperquest({
+			uri: 'http://music.163.com/api/album/' + key + '?' + qs.stringify(params),			
+			headers: HEADERS
+		})
+		req.pipe(concat(function(data) {
+		return cb(null, JSON.parse(data))
+		}))		
+		req.on('error', function(err) {
+		return cb(err)
+		})		
+	}
 	
-		var url = 'https://www.youtube.com/watch?v=' + id
+	function album(id) {
+		var totalSec, minutes, seconds
+
+		$('#sidepage2').show()		
+		var s = "<a href=" + quote + "javascript:close_sidepage2() " + quote + "><img src='/images/close.svg' width='50'></a>"		
+		$('#sidepage2').html(s)
+
+		var $el = $('.popcorn-load');
+		hasToShow = true
+		$el[hasToShow === false ? 'addClass' : 'removeClass']('hidden');
 		
+		album163(id, function(err, data) {
+			if (err) return error(err)
+			//console.log(data)
+
+			if (data) {						
+
+				s += "<br><br><img src='" + data.album.picUrl + "?param=130y130'></a><br><br>" + data.album.name + " by " + data.album.artist.name
+
+				s += "<br><br><table width='100%' cellspacing='5' cellpadding='10' class='hoverTable'>"			
+				
+				data.album.songs.forEach(function(song) {
+					//console.log(song.name + " : " + song.artists[0].name + " : " + song.duration + " : " + song.mp3Url)
+				
+					filename = clean(song.artists[0].name + " - " + song.name)
+					//console.log(filename)
+					totalSec = song.duration
+					totalSec = totalSec / 1000
+					minutes = parseInt( totalSec / 60 ) % 60
+					seconds = Math.round(totalSec % 60)
+													
+					s += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play3('" + song.mp3Url + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
+					s += "<td width='60%'>" +  song.name + "</td>"
+					s += "<td width='5%'>" + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds) + "</td>"				  
+					s += "<td width='3%'><a href=" + quote + "javascript:dl3('" + song.mp3Url + "', '" + filename + "') " + quote + "><img src='/images/dlz.png' title='Download'></a></td>"
+					s += "<td width='3%'><i class='fa fa-star'></i><i class='fa fa-star'></i></td>"
+					s += "</tr>"							
+				})
+				s += "</table><table><tr><td height='120'></td></tr></table>"
+				hasToShow = false
+				$el[hasToShow === false ? 'addClass' : 'removeClass']('hidden');				
+				$('#sidepage2').html(s)		
+			}									
+		})						
+	}	
+  
+  	function artist_songs(id, cb) {	
+
+		var request = require('request');
+		request('http://music.163.com/artist?id=' + id, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				//console.log(body) 
+				
+				var str = body
+				var i = str.indexOf('var g_hotsongs')
+				//console.log(i)
+				var j = str.indexOf(';<\/script>', i)
+				//console.log(j)
+				var jj = str.substr(i + 16, j - i -16)				
+				//console.log(jj)
+				//console.log(JSON.parse(jj))
+				
+				return cb(null, JSON.parse(jj))				
+			}
+			
+			request.on('error', function(err) {
+				return cb(err)
+			})					
+		})
+	}
+		
+	function artist(id) {
+
+		var aa = new Array()
+		var s, t, title
+		var i = 0
+		var cnt = 0
+		var totalSec, minutes, seconds
+
+		$('#sidepage').show()		
+		t = "<a href=" + quote + "javascript:close_sidepage() " + quote + "><img src='/images/close.svg' width='50'></a>"
+		$('#sidepage').html(t)		
+
+		var $el = $('.popcorn-load');
+		hasToShow = true
+		$el[hasToShow === false ? 'addClass' : 'removeClass']('hidden');
+		
+		artist_songs(id, function(err, data) {
+		
+			if (err) return error(err)					
+			//console.log(data)
+			
+			if (data) {						
+
+				t += "<br><table width='100%' cellspacing='10' cellpadding='10'><tr>"	
+				s = ""
+				s += "<br><br><table width='100%' cellspacing='5' cellpadding='10' class='hoverTable'>"			
+				
+				data.forEach(function(song) {
+				//console.log(song.name + " : " + song.album.name + " : " + song.duration + " : " + song.mp3Url)
+				
+					if (!check_dup(song.album.id, aa)) {
+						aa[i] = song.album.id
+						i = i + 1					
+						cnt = cnt + 1
+						if (cnt > 5) {
+						  t += "</tr><tr>"
+						  cnt = 1
+						}
+						title = song.album.name
+						title = title.replace("'","")
+						if (song.album.picUrl) {
+							t += "<td height='145px'><a href=" + quote + "javascript:album('" + song.album.id + "') " + quote + "><img src='" + song.album.picUrl + "?param=130y130' title='" + title + "'></a></td>"
+						} else {	
+							t += "<td height='145px'><a href=" + quote + "javascript:album('" + song.album.id + "') " + quote + ">" + song.album.name  + "</a></td>"
+						}
+					}		
+
+					filename = clean(song.artists[0].name + " - " + song.name)
+					//console.log(filename)
+					totalSec = song.duration
+					totalSec = totalSec / 1000
+					minutes = parseInt( totalSec / 60 ) % 60
+					seconds = Math.round(totalSec % 60)
+													
+					s += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play3('" + song.mp3Url + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
+					s += "<td width='60%'>" +  song.name + "</td>"
+					s += "<td width='5%'>" + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds) + "</td>"				  
+					s += "<td width='3%'><a href=" + quote + "javascript:dl3('" + song.mp3Url + "', '" + filename + "') " + quote + "><img src='/images/dlz.png' title='Download'></a></td>"
+					s += "<td width='3%'><i class='fa fa-star'></i><i class='fa fa-star'></i></td>"
+					s += "</tr>"		
+				})
+				t += "</tr></table>"
+				s += "</table><table><tr><td height='120'></td></tr></table>"	
+				hasToShow = false
+				$el[hasToShow === false ? 'addClass' : 'removeClass']('hidden');				
+				$('#sidepage').html(t + s)		
+
+				//for (var i = 0; i < aa.length; i++) {
+					//console.log(aa[i])
+				//}
+			}						
+		})		
+	}
+
+	function detail163 (key, cb) {	
+		var params = {
+			id: key,
+			ids: '[' + key + ']',
+			csrf_token: ''
+		}
+		var req = hyperquest({
+			uri: 'http://music.163.com/api/song/detail' + '?' + qs.stringify(params),
+			headers: HEADERS
+		})
+		req.pipe(concat(function(data) {
+		return cb(null, JSON.parse(data))
+		}))		
+		req.on('error', function(err) {
+		return cb(err)
+		})		
+	}
+	function play3(url) {
+		stop()	
+		var a = document.getElementById("playerid")
+		a.src = url
+	}
+	function play2(id) {
+		stop()	
+		detail163(id, function(err, res) {
+			if (err) return error(err)
+			if (res.songs) {
+				res.songs.forEach(function(song) {
+				//console.log('Song info: ' + song.artists[0].name + ' by ' + song.name + ' ' + song.mp3Url)
+				var a = document.getElementById("playerid")
+				a.src = song.mp3Url
+			})
+			}	
+		})				
+	}
+	function play(id) {	
+		stop()
+		var url = 'https://www.youtube.com/watch?v=' + id		
 		ytdl.getInfo(url, { downloadURL: true }, function(err, info) {
 			if (err) {
 				alert(err.message)
 				return
-			}
-		
+			}		
 			//console.log(info)
-			var play_url = info.formats[0].url
-			var player = '<video autoplay preload><source src="' + play_url + '" /></video>' 	  
-			$('#vidplayer').html(player)
-		});
-
+			var a = document.getElementById("playerid")
+			a.src = info.formats[0].url
+		});	
+	}
+	function dl3(url, filename) {  
 	
+		if (!winxp) {
+			var r = confirm("Download song?");
+			if (r == false)	{
+				return		 
+			}
+		}
+		
+		var checkname = path.join(mymusic, filename)
+		if (fs.existsSync(checkname)) {
+			if (!winxp) {
+				alert("MP3 file already exists.")
+				return
+			}
+		}						
+		$('.downl').show()		
+		var tmpFile = path.join(os.tmpDir(), filename + '.tmp');
+		//console.log(tmpFile)  
+  		userTracking.pageview({dp: "/music/download2?q="+encodeURIComponent(filename), dt: "Music Download 2", dh: "http://cnn.com"}).send();  		
+
+		var request = hyperquest.get(url)
+		var file = fs.createWriteStream(tmpFile)
+
+		request.on('response', function (res) {
+			//console.log('Start to download song')
+		})
+		request.on('error', function (res) {
+			//console.log('error while trying to download song')
+		})
+		request.on('data', function(data) {
+			file.write(data)
+		})
+		request.on('end', function() {
+		//	console.log('Finish downloading song')
+			filename = path.join(mymusic, filename)	
+			fs.rename(tmpFile, filename)		
+			$('.downl').hide()									
+		})				
 	}
 	
+	function dl2(id, filename) {  
+	
+		if (!winxp) {
+			var r = confirm("Download song?");
+			if (r == false)	{
+				return		 
+			}
+		}
+		
+		var checkname = path.join(mymusic, filename)
+		if (fs.existsSync(checkname)) {
+			if (!winxp) {
+				alert("MP3 file already exists.")
+				return
+			}
+		}
+						
+		$('.downl').show()
+				
+		var tmpFile = path.join(os.tmpDir(), filename + '.tmp');
+
+		//console.log(tmpFile)
+  
+  		userTracking.pageview({dp: "/music/download2?q="+encodeURIComponent(filename), dt: "Music Download 2", dh: "http://cnn.com"}).send();  		
+
+		detail163(id, function(err, res) {
+			if (err) return error(err)
+			if (res.songs) {
+				res.songs.forEach(function(song) {
+					//console.log('Song info: ' + song.artists[0].name + ' by ' + song.name + ' ' + song.mp3Url)
+					var url = song.mp3Url
+				
+					var request = hyperquest.get(url)
+					var file = fs.createWriteStream(tmpFile)
+
+					request.on('response', function (res) {
+						//console.log('Start to download song')
+					})
+					request.on('error', function (res) {
+						//console.log('error while trying to download song')
+					})
+					request.on('data', function(data) {
+						file.write(data)
+					})
+					request.on('end', function() {
+					//	console.log('Finish downloading song')
+						filename = path.join(mymusic, filename)	
+						fs.rename(tmpFile, filename)		
+						$('.downl').hide()									
+					})				
+				})
+			}	
+		})								
+	}
+		
 	function dl(id, filename) {  
 	
 		if (!winxp) {
@@ -88,14 +435,14 @@
 		}
 		
 		cnt_dl = cnt_dl + 1;
-		console.log(cnt_dl)
+		//console.log(cnt_dl)
 
-		$('#vidplayer').html('')  // stop if playing
+		stop()
 		$('.downl').show()
 				
 		var tmpFile = path.join(os.tmpDir(), filename + '.tmp');
 
-		console.log(tmpFile)
+		//console.log(tmpFile)
   
   		userTracking.pageview({dp: "/music/download?q="+encodeURIComponent(filename), dt: "Music Download", dh: "http://cnn.com"}).send();  		
 
@@ -112,23 +459,25 @@
 			.on('end', function() {
 	
 				cnt_dl = cnt_dl - 1
-				console.log(cnt_dl)
+				//console.log(cnt_dl)
 				if (cnt_dl < 1) {
 					$('.downl').hide()				
 				}
 				filename = path.join(mymusic, filename)	
 				fs.rename(tmpFile, filename)
-				console.log('ffmpeg done')  
+				//console.log('ffmpeg done')  
 			})
 			.addOption('-ab', '128K')
 			.toFormat('mp3')
 			.writeToStream(writing);            
 	}
-  
+
 	function search(term) {
 
-		$('html,body').css('cursor','wait');
+		//$('html,body').css('cursor','wait');
 		$('#songs').html('')
+		$('#sidepage').hide(800)
+		$('#sidepage2').hide(800)
 
 		userTracking.pageview({dp: "/music/search?q="+encodeURIComponent(term), dt: "Music Search", dh: "http://cnn.com"}).send();  		
 		
@@ -137,17 +486,73 @@
 		var id
 		var duration
 		var filename
-		var quote
 		var star
-		quote = String.fromCharCode(34)
-									
+		var h = ''
+		var s = ''
+		
+		api.search(term, function(err, res) {
+		//search163(term, function(err, res) {
+			if (err) return error(err)
+			var data = res.result
+			
+			if (data.artists) {
+				s += "<table width='100%' cellspacing='5' cellpadding='10'><tr>"
+				data.artists.forEach(function(artist) {
+				//console.log(artist.name + ' ID: ' + artist.id)
+				s += "<td>"
+				if (artist.picUrl) {
+					s += "<a href=" + quote + "javascript:artist('" + artist.id + "') " + quote + "><img src='" + artist.picUrl + "?param=130y130' title='Albums'></a>"					
+				}
+				s += "<br><a href=" + quote + "javascript:artist('" + artist.id + "') " + quote + ">" + artist.name + "</a></td>"
+				})
+				s += "</table><br>"				
+			}		
+
+			if (data.albums) {
+				//console.log(data.albums)
+				data.albums.forEach(function(album) {
+				//console.log(album.name + chalk.white.italic(' by ') + album.artist.name + chalk.white.italic(' ID: ') + album.id)
+				//if (album.artist.picUrl) {
+				//	s += "<a href=" + quote + "javascript:album('" + album.id + "') " + quote + "><img src='" + album.artist.picUrl + "?param=130y130' title='Songs'></a>"	
+				//}
+				s += "<br><a href=" + quote + "javascript:album('" + album.id + "') " + quote + ">" + album.name + " by " + album.artist.name + "</a><br>"
+				})
+			}			
+			
+			s += "<br><br> <table width='100%' cellspacing='5' cellpadding='10' class='hoverTable'>"
+
+			if (data.songs) {
+				data.songs.forEach(function(song) {
+				//console.log(song.name + chalk.white.italic(' by ') + song.artists[0].name + chalk.white.italic(' ID: ') + song.id)
+
+				filename = clean(song.artists[0].name + " - " + song.name)
+				
+				var totalSec = song.duration
+				var totalSec = totalSec / 1000
+				var minutes = parseInt( totalSec / 60 ) % 60
+				var seconds = Math.round(totalSec % 60)
+													
+				s += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play2('" + song.id + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
+			    s += "<td width='60%'>" +  song.artists[0].name + " - " + song.name + "</td>"
+			    s += "<td width='5%'>" + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds) + "</td>"				  
+			    s += "<td width='3%'><a href=" + quote + "javascript:dl2('" + song.id + "', '" + filename + "') " + quote + "><img src='/images/dlz.png' title='Download'></a></td>"
+			    s += "<td width='3%'><i class='fa fa-star'></i><i class='fa fa-star'></i></td>"
+				s += "</tr>"								
+				})
+			}
+			
+			s += "</table>"
+			
+			$('#songs').html(s + h)
+			
+		}) // search163
+
 		req.open('GET', 'http://gdata.youtube.com/feeds/api/videos?category=Music&q=' + term + '&alt=jsonc&format=5&max-results=50&v=2', false); 
-//		req.timeout  Gets or sets the time-out value. ?? 
+		//req.timeout  Gets or sets the time-out value. ?? 
 		req.send(null);
 
-		var h = ''
-		h += "<table width='100%' cellspacing='5' cellpadding='10'>"
-		
+		h += "<table width='100%' cellspacing='5' cellpadding='10' class='hoverTable'>"
+				
 		if (req.status == 200){
 			
 			var r = JSON.parse(req.responseText);
@@ -199,24 +604,28 @@
 				  } else {
 				    star = 'star'					
 				  }				  
-			      h += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play('" + id + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
+ 
+				  h += "<tr><td width='3%' height='40px'><a href=" + quote + "javascript:play('" + id + "') " + quote + "><img src='/images/playz.png' title='Play'></a></td>"
 			      h += "<td width='60%'>" +  title + "</td>"
 			      h += "<td width='5%'>" + getTime(duration) + "</td>"				  
 			      h += "<td width='3%'><a href=" + quote + "javascript:dl('" + id + "', '" + filename + "') " + quote + "><img src='/images/dlz.png' title='Download'></a></td>"
 			      h += "<td width='3%'><i class='fa fa-star" + star + "'></i></td>"
 				  h += "</tr>"				
+				  
 				}
 			}
 			
-			h += "<tr></tr></table>"
+			h += "</table><table><tr><td height='120'></td></tr></table>"			
+			$('#songs').html(h)	
 			
-			$(function() {
-			  $('#songs').html(h)	
-			  
-			})		// for
-		  }  		// if
-		}
-		$('html,body').css('cursor','auto');
+		  }  		// for
+		}			// if
+								
+		//$('html,body').css('cursor','auto');
+		
+		$elBody = $('body'),
+        $songlist = $('#songs'),
+        $songlist.animate({ scrollTop: 0 })		
 	}
 
 	function getTime(duration) {
@@ -227,7 +636,7 @@
 		if (hours > 0) {
 			return hours + ':' + padZero(minutes) + ':' + padZero(seconds);
 		} else {
-			return padZero(minutes) + ':' + padZero(seconds);
+			return minutes + ':' + padZero(seconds);
 		}
 	}
 
@@ -264,7 +673,7 @@
 	function show_folder() {
 		gui.Shell.showItemInFolder(mymusic)
 	}
-  
+
 </script>
 
 
@@ -291,10 +700,20 @@
 	  </div>	
     </div>					
 	
+    <div class="popcorn-load hidden">
+      <div class="wrapper">
+        <span class="spinner"></span>
+      </div>
+    </div>
+	
     <div id="songs" class="page"></div>
 	
- 
-	<div id="vidplayer"></div>
+	<div id="sidepage" class="page" style="display: none;"></div>
+	<div id="sidepage2" class="page" style="display: none;"></div>
+	 
+	<div id="vidplayer" style="display: hidden">
+	  <video id="playerid" autoplay><source src=""></video> 
+	</div>
 
     <!-- Settings Module and API Keys -->
     <script src="js/vendor/settings.js"></script>
@@ -327,6 +746,8 @@
 
   $('.downl').hide()
 
+  //search('prince')
+		//play2('111')
 	</script>	
 	
 	<script>userTracking.pageview({dp: "/music", dt: "Music", dh: "http://cnn.com"}).send();  </script>

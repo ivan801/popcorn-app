@@ -6,7 +6,7 @@
 Settings = {
     "_defaultSettings": {
         // Default to the first beta
-        "version": "6.1.0",
+        "version": "6.2.0",
         "dbVersion": "1.0",
 		"disclaimerAccepted": 1,
 		"mv": 0,

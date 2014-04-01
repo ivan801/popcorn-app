@@ -1,3 +1,11 @@
+
+.hoverTable tr{
+  background: :
+}
+.hoverTable tr:hover {
+  background-color: #000000;
+}
+
 a {
   text-decoration: none;
   color: #6CDA6C;
@@ -44,11 +52,15 @@ a {
 
 .downl {
   position: absolute;
-  right: 85px;
+  right: 80px;
   top: 20px;
 }
 
-#songs {
+#sidepage{
+  -webkit-transform-style: preserve-3d;
+  animation: sidebareffect .9s;
+  -webkit-animation: sidebareffect .9s;
+  -webkit-transform: translateZ(0);
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -61,6 +73,35 @@ a {
   background: #181817;
 }
 
+#sidepage2{
+  -webkit-transform-style: preserve-3d;
+  animation: sidebareffect .9s;
+  -webkit-animation: sidebareffect .9s;
+  -webkit-transform: translateZ(0);
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: visible;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 110px;
+  padding: 20px;
+  background: #181817;
+}
+
+#songs{
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: visible;
+  overflow-y: overlay;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 110px;
+  padding: 20px;
+  background: #181817;
+}
 
 #catalog-select2 {
   -webkit-box-sizing: border-box;

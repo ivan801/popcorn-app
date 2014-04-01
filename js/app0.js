@@ -29,24 +29,6 @@ var
     // i18n module (translations)
     i18n = require("i18n");
 
-// Create the System Temp Folder. This is used to store temporary data like movie files.
-if( ! fs.existsSync(tmpFolder) ) { fs.mkdir(tmpFolder); }
-
-var wipeTmpFolder = function() {
-    if( typeof tmpFolder != 'string' ){ return; }
-    fs.readdir(tmpFolder, function(err, files){
-        for( var i in files ) {
-            fs.unlink(tmpFolder+'/'+files[i]);
-        }
-    });
-}
-
-// Wipe the tmpFolder when closing the app (this frees up disk space)
-win.on('close', function(){
-    wipeTmpFolder();
-    win.close(true);
-});
-
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }

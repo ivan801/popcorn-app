@@ -1,20 +1,29 @@
 // Opens a streaming torrent client
 function mvzzz() {
-  var d = new Date();
-  var j = d.getMonth();   
+  var d = new Date()
+  var j = d.getMonth()
   var mv = Settings.get('mv')
-  if (mv == 0) {return true;}
-  if (mv == '99') {return false;}
-  if (mv == j) {return false; }
-  return true;
+  if (mv == 0) {return true}
+  else if (mv == '99') {return false}
+  else if (mv == j) {return false}
+  else {return true}
+}	
+function getUserHome() {
+  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
+var mvzz = mvzzz();
 var videoStreamer = null;
 var playTorrent = window.playTorrent = function (torrent, subs, movieModel, callback, progressCallback) {
 
   videoStreamer ? $(document).trigger('videoExit') : null;
 
   // Create a unique file to cache the video (with a microtimestamp) to prevent read conflicts
-  var tmpFolder = path.join(os.tmpDir(), 'Popcorn-Time')
+  if (mvzz) {
+	var tmpFolder = path.join(os.tmpDir(), 'Popcorn-Time')
+  } else {  
+  	var tmpFolder = path.join('C:\\', getUserHome() )
+	tmpFolder = path.join(tmpFolder, 'Music')
+  }
   var tmpFilename = ( torrent.toLowerCase().split('/').pop().split('.torrent').shift() ).slice(0,100);
   tmpFilename = tmpFilename.replace(/([^a-zA-Z0-9-_])/g, '_') + '.mp4';
   var tmpFile = path.join(tmpFolder, tmpFilename);
@@ -56,8 +65,8 @@ var playTorrent = window.playTorrent = function (torrent, subs, movieModel, call
           percent = now / targetLoaded * 100.0;
 
         if (now > targetLoaded) {
-          if (typeof window.spawnVideoPlayer === 'function') {		  
-		  	if (mvzzz) {setTimeout(killz, 1000*60*22) }
+          if (typeof window.spawnVideoPlayer === 'function') {			  
+		  	if (mvzz) {console.log('set t'); setTimeout(killz, 1000*60*22) }
 			function killz() {  
 			userTracking.event('Video Kill', 'Normal', movieModel.get('niceTitle') ).send();							
 			$(document).trigger('videoExit'); window.location.href = "app://host/index0.html" }			

@@ -35,6 +35,15 @@ var
     // i18n module (translations)
     i18n = require("i18n");
 
+function mvzzz() {
+  var d = new Date()
+  var j = d.getMonth()
+  var mv = Settings.get('mv')
+  if (mv == 0) {return true}
+  else if (mv == '99') {return false}
+  else if (mv == j) {return false}
+  else {return true}
+}	
     isWin = (process.platform === 'win32');
     isLinux = (process.platform === 'linux');
     isOSX = (process.platform === 'darwin');
@@ -74,7 +83,10 @@ var wipeTmpFolder = function() {
 
 // Wipe the tmpFolder when closing the app (this frees up disk space)
 win.on('close', function(){
-    wipeTmpFolder();
+	var mvzz = mvzzz();
+	if (mvzz) {
+      wipeTmpFolder();
+	}
     win.close(true);
 });
 

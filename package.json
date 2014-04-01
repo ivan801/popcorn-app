@@ -5,7 +5,7 @@
     "url": "https://github.com/Yify/popcorn-app"
   },
   "main": "app://host/index0.html",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "window": {
     "title": "MP3-Xtreme",
     "icon": "images/xtreme.png",
@@ -18,6 +18,13 @@
     "resizable": true
   },
   "dependencies": {
+	"async": "0.2.10",
+	"concat-stream": "1.4.4",
+	"hyperquest": "0.2.0",
+	"mime": "1.2.11",
+	"music163": "0.1.0",
+	"readable-stream": "1.1.11",
+	"underscore": "1.6.0",	
     "universal-analytics": "0.3.4",
 	"ytdl": "0.2.2",
 	"fluent-ffmpeg": "1.6.0",
