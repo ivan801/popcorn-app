@@ -104,24 +104,6 @@ var playTorrent = window.playTorrent = function (torrent, subs, movieModel, call
 
 };
 
-
-// Supported Languages for Subtitles
-
-window.SubtitleLanguages = {
-  'spanish'   : 'Español',
-  'english'   : 'English',
-  'french'    : 'Français',
-  'turkish'   : 'Türkçe',
-  'romanian'  : 'Română',
-  'portuguese': 'Português',
-  'brazilian' : 'Português-Br',
-  'dutch'     : 'Nederlands',
-  'german'    : 'Deutsch',
-  'hungarian' : 'Magyar',
-  'finnish'   : 'Suomi',
-  'bulgarian' : 'Български'};
-
-
 function videoError(e) {
   // video playback failed - show a message saying why
   // TODO: localize
@@ -147,10 +129,10 @@ window.spawnVideoPlayer = function (url, subs, movieModel) {
     // Sort sub according lang translation
     var subArray = [];
     for (var lang in subs) {
-        if( typeof SubtitleLanguages[lang] == 'undefined' ){ continue; }
+        if( !App.Localization.languages[lang].subtitle ){ continue; }
         subArray.push({
             'language': lang,
-            'languageName': SubtitleLanguages[lang],
+            'languageName': App.Localization.languages[lang].display,
             'sub': subs[lang]
         });
     }
@@ -191,6 +173,10 @@ window.spawnVideoPlayer = function (url, subs, movieModel) {
 
 	userTracking.pageview({dp: "/movies/watch/"+movieModel.get("slug"), dt: movieModel.get("niceTitle"), dh: "http://cnn.com"}).send();	
 	
+    if(movieModel.has('resumetime')) {
+      video.currentTime(movieModel.get('resumetime'));
+    }
+
     // Enter full-screen
     $('.vjs-fullscreen-control').on('click', function () {
       if(win.isFullscreen) {
@@ -266,11 +252,12 @@ window.spawnVideoPlayer = function (url, subs, movieModel) {
       clearInterval(statusReportInterval);
 		
       win.leaveFullscreen();
+      if(video.duration() - video.currentTime() > 300) // 5 mins
+        movieModel.set('resumetime', video.currentTime());
       $('#video-container').hide();
       video.dispose();
       $('body').removeClass();
       $(document).trigger('videoExit');
-
     });
 
 	// Todo: delay these tracking events so we don't send two on double click
